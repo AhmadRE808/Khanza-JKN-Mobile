@@ -62,7 +62,8 @@ if ($method == 'POST') {
                 $day = array('Sun' => 'AKHAD', 'Mon' => 'SENIN', 'Tue' => 'SELASA', 'Wed' => 'RABU', 'Thu' => 'KAMIS', 'Fri' => 'JUMAT', 'Sat' => 'SABTU');
                 $hari=$day[$tentukan_hari];
 
-                $data = fetch_array(query("SELECT pasien.no_rkm_medis, pasien.no_ktp, pasien.no_peserta FROM pasien where pasien.no_ktp='$decode[nik]' and pasien.no_peserta='$decode[nomorkartu]'"));
+                $data_pasien = query("SELECT no_rkm_medis FROM pasien where no_ktp='$decode[nik]' and no_peserta='$decode[nomorkartu]' AND no_rkm_medis = '$decode[nomorrm]'");
+                $data = fetch_array($data_pasien);
                 $poli = query("SELECT kd_poli_bpjs FROM maping_poli_bpjs WHERE kd_poli_bpjs='$decode[kodepoli]'");
                 $cek_kouta = fetch_array(query("SELECT jadwal.kuota - (select COUNT(booking_registrasi.tanggal_periksa) FROM booking_registrasi
                     WHERE booking_registrasi.tanggal_periksa='$decode[tanggalperiksa]' AND booking_registrasi.kd_dokter=jadwal.kd_dokter ) as sisa_kouta, jadwal.kd_dokter, jadwal.kd_poli,
@@ -123,17 +124,35 @@ if ($method == 'POST') {
           	        }
                 } else {
                     if ($cek_kouta['sisa_kouta'] > 0) {
-                        $no_reg_akhir = fetch_array(query("SELECT max(no_reg) FROM booking_registrasi WHERE kd_poli='$decode[kodepoli]' and tanggal_periksa='$decode[tanggalperiksa]'"));
-                        $no_urut_reg = substr($no_reg_akhir['0'], 0, 3);
-                        $no_reg = sprintf('%03s', ($no_urut_reg + 1));
-                        $query = query("insert into booking_registrasi set tanggal_booking=CURDATE(),jam_booking=CURTIME(), no_rkm_medis='$data[no_rkm_medis]',tanggal_periksa='$decode[tanggalperiksa]',"
-                                . "kd_dokter='$cek_kouta[kd_dokter]',kd_poli='$cek_kouta[kd_poli]',no_reg='$no_reg',kd_pj='BPJ',limit_reg='1',waktu_kunjungan='$decode[tanggalperiksa] $cek_kouta[jam_mulai]',status='Belum'");
+                        if(empty($decode['nomorrm'])){
+                          // Get antrian loket
+                          $no_reg_akhir = fetch_array(query("SELECT max(noantrian) FROM antrian_loket WHERE type = 'Loket' AND postdate='$decode[tanggalperiksa]'"));
+                          $no_urut_reg = substr($no_reg_akhir['0'], 0, 3);
+                          $no_reg = sprintf('%03s', ($no_urut_reg + 1));
+                          $jenisantrean = 1;
+                          $query = query("INSERT INTO antrian_loket(kd, type, noantrian, postdate, start_time, end_time) VALUES (NULL, 'Loket', '$no_reg', '$decode[tanggalperiksa]', '$cek_kouta[jam_mulai]', '00:00:00')");
+                        } else if(num_rows($data_pasien) == 0){
+                            // Get antrian loket
+                            $no_reg_akhir = fetch_array(query("SELECT max(noantrian) FROM antrian_loket WHERE type = 'Loket' AND postdate='$decode[tanggalperiksa]'"));
+                            $no_urut_reg = substr($no_reg_akhir['0'], 0, 3);
+                            $no_reg = sprintf('%03s', ($no_urut_reg + 1));
+                            $jenisantrean = 1;
+                            $query = query("INSERT INTO antrian_loket(kd, type, noantrian, postdate, start_time, end_time) VALUES (NULL, 'Loket', '$no_reg', '$decode[tanggalperiksa]', '$cek_kouta[jam_mulai]', '00:00:00')");
+                        } else {
+                          // Get antrian poli
+                          $no_reg_akhir = fetch_array(query("SELECT max(no_reg) FROM booking_registrasi WHERE kd_poli='$decode[kodepoli]' and tanggal_periksa='$decode[tanggalperiksa]'"));
+                          $no_urut_reg = substr($no_reg_akhir['0'], 0, 3);
+                          $no_reg = sprintf('%03s', ($no_urut_reg + 1));
+                          $jenisantrean = 2;
+                          $query = query("insert into booking_registrasi set tanggal_booking=CURDATE(),jam_booking=CURTIME(), no_rkm_medis='$data[no_rkm_medis]',tanggal_periksa='$decode[tanggalperiksa]',"
+                                  . "kd_dokter='$cek_kouta[kd_dokter]',kd_poli='$cek_kouta[kd_poli]',no_reg='$no_reg',kd_pj='BPJ',limit_reg='1',waktu_kunjungan='$decode[tanggalperiksa] $cek_kouta[jam_mulai]',status='Belum'");
+                        }
                         if ($query) {
                             $response = array(
                                 'response' => array(
                                     'nomorantrean' => $no_reg,
                                     'kodebooking' => $no_reg,
-                                    'jenisantrean' => 1,
+                                    'jenisantrean' => $jenisantrean,
                                     'estimasidilayani' => strtotime($cek_kouta['jam_mulai']) * 1000,
                                     'namapoli' => $cek_kouta['nm_poli'],
                                     'namadokter' => $cek_kouta['nm_dokter']
