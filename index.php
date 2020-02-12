@@ -253,7 +253,7 @@ if ($method == 'POST') {
                                 'namapoli' => $data['nm_poli'],
                                 'totalantrean' => $data['jumlah'],
                                 'jumlahterlayani' => $data['terlayani'],
-                                'lastupdate' => strtotime(date('H:i:s')) * 1000
+                                'lastupdate' => strtotime(date('Y-m-d H:i:s')) * 1000
                             ),
                             'metadata' => array(
                                 'message' => 'Ok',
@@ -396,7 +396,7 @@ if ($method == 'POST') {
                                     'namapoli' => $data['namapoli'],
                                     'terlaksana' => $data['terlaksana'],
                                     'nopeserta' => $data['nopeserta'],
-                                    'lastupdate' => strtotime(date('H:i:s')) * 1000
+                                    'lastupdate' => strtotime(date('Y-m-d H:i:s')) * 1000
                             );
                         }
                         $response = array(
