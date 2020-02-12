@@ -173,7 +173,7 @@ if ($method == 'POST') {
                                     'nomorantrean' => $no_reg,
                                     'kodebooking' => $no_reg,
                                     'jenisantrean' => $jenisantrean,
-                                    'estimasidilayani' => strtotime($cek_kouta['jam_mulai']) * 1000,
+                                    'estimasidilayani' => strtotime($decode['tanggalperiksa'].' '.$cek_kouta['jam_mulai']) * 1000,
                                     'namapoli' => $cek_kouta['nm_poli'],
                                     'namadokter' => $cek_kouta['nm_dokter']
                                 ),
@@ -183,7 +183,7 @@ if ($method == 'POST') {
                                 )
                             );
                             // debug only
-                            query("DELETE FROM booking_registrasi WHERE no_rkm_medis = '$data[no_rkm_medis]'");
+                            //query("DELETE FROM booking_registrasi WHERE no_rkm_medis = '$data[no_rkm_medis]'");
                         } else {
                             $response = array(
                                 'metadata' => array(
