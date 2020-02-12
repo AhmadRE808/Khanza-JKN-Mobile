@@ -63,8 +63,12 @@ if ($method == 'POST') {
                 $day = array('Sun' => 'AKHAD', 'Mon' => 'SENIN', 'Tue' => 'SELASA', 'Wed' => 'RABU', 'Thu' => 'KAMIS', 'Fri' => 'JUMAT', 'Sat' => 'SABTU');
                 $hari=$day[$tentukan_hari];
 
-                $h7 = strtotime('+7 days' , strtotime($date)) ;
+                $h1 = strtotime('+1 days' , strtotime($date)) ;
+                $h1 = date('Y-m-d', $h1);
+                $_h1 = date('d-m-Y', strtotime($h1));
+                $h7 = strtotime('+7 days', strtotime($date)) ;
                 $h7 = date('Y-m-d', $h7);
+                $_h7 = date('d-m-Y', strtotime($h7));
 
                 $data_pasien = query("SELECT no_rkm_medis FROM pasien where no_ktp='$decode[nik]' and no_peserta='$decode[nomorkartu]' AND no_rkm_medis = '$decode[nomorrm]'");
                 $data = fetch_array($data_pasien);
@@ -100,7 +104,7 @@ if ($method == 'POST') {
                    $errors[] = 'Tanggal periksa tidak boleh kosong';
                 }
                 if($decode['tanggalperiksa'] == $date || $decode['tanggalperiksa'] > $h7) {
-                   $errors[] = 'Tanggal periksa harus H+1 sampai H+7';
+                   $errors[] = 'Tanggal periksa bisa dilakukan tanggal '.$_h1.' hingga tanggal '.$_h7;
                 }
                 if(empty($decode['kodepoli'])) {
                    $errors[] = 'Kode poli tidak boleh kosong';
