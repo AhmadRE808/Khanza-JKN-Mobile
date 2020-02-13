@@ -188,7 +188,7 @@ if ($method == 'POST') {
                                     'nomorantrean' => $no_reg,
                                     'kodebooking' => $no_reg,
                                     'jenisantrean' => $jenisantrean,
-                                    'estimasidilayani' => $decode['tanggalperiksa'].' '.$cek_kouta['jam_mulai'],
+                                    'estimasidilayani' => strtotime($decode['tanggalperiksa'].' '.$cek_kouta['jam_mulai']) * 1000,
                                     'namapoli' => $cek_kouta['nm_poli'],
                                     'namadokter' => $cek_kouta['nm_dokter']
                                 ),
