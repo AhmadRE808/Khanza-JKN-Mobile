@@ -5,7 +5,7 @@ if (preg_match ('/config.php/', basename($_SERVER['PHP_SELF']))) die ('Unable to
 define ("DB_HOST","localhost");
 define ("DB_USER","root");
 define ("DB_PASS","");
-define ("DB_NAME","sik");
+define ("DB_NAME","rshd_sik");
 
 define ("ANTRIAN_LITE","YES"); // NO jika menggunakan antrian vanilla
 define ("KD_PJ","BPJ"); // Sesuaikan dengan kd_pj di tabel password_asuransi
