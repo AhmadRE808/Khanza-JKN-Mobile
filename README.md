@@ -13,7 +13,7 @@ ALTER TABLE antrian_referensi
   ADD PRIMARY KEY (`nomor_referensi`);
 ~~~~
 
-2. Extract file khanza-bpjs-api.zip ke webapps (atau public_html)
+2. Clone repo ke webapps (atau public_html)
 3. Sesuaikan config.php
 4. Buat user dan password asuransi dengan kode_pj BPJ (lihat di khanza desktop)
 5. Gunakan user dan password pada point 3 untuk generate token
