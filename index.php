@@ -13,8 +13,8 @@ require_once('config.php');
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET["act"]) ? $_GET["act"] : null;
 
-$kd_pj = 'BPJ';
 $bpj = fetch_assoc(query("SELECT AES_DECRYPT(usere,'nur') as username, AES_DECRYPT(passworde,'windi') as password FROM password_asuransi WHERE kd_pj = '$kd_pj'"));
+
 $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
 $payload = json_encode(['username' => $bpj['username'], 'password' => $bpj['password'], 'date' => strtotime(date('Y-m-d')) * 1000]);
 $base64UrlHeader = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($header));
@@ -70,26 +70,15 @@ if ($method == 'POST') {
                 $h7 = date('Y-m-d', $h7);
                 $_h7 = date('d-m-Y', strtotime($h7));
 
-                $data_pasien = query("SELECT no_ktp, no_peserta FROM pasien where no_ktp='$decode[nik]' and no_peserta='$decode[nomorkartu]'");
+                $data_pasien = query("SELECT no_ktp, no_peserta, no_rkm_medis FROM pasien where no_peserta='$decode[nomorkartu]'");
                 $data = fetch_array($data_pasien);
                 $poli = query("SELECT kd_poli_bpjs, kd_poli_rs FROM maping_poli_bpjs WHERE kd_poli_bpjs='$decode[kodepoli]'");
-                $sql_cek_kouta = "SELECT jadwal.kuota - (select COUNT(booking_registrasi.tanggal_periksa) FROM booking_registrasi
-                    WHERE booking_registrasi.tanggal_periksa='$decode[tanggalperiksa]' AND booking_registrasi.kd_dokter=jadwal.kd_dokter ) as sisa_kouta, jadwal.kd_dokter, jadwal.kd_poli,
-                    jadwal.jam_mulai as jam_mulai, poliklinik.nm_poli,dokter.nm_dokter
-                    FROM jadwal
-                    INNER JOIN maping_poli_bpjs ON maping_poli_bpjs.kd_poli_rs=jadwal.kd_poli
-                    INNER JOIN poliklinik ON poliklinik.kd_poli=jadwal.kd_poli
-                    INNER JOIN dokter ON dokter.kd_dokter=jadwal.kd_dokter
-                    WHERE jadwal.hari_kerja='$hari' AND  maping_poli_bpjs.kd_poli_bpjs='$decode[kodepoli]'
-                    GROUP BY jadwal.kd_dokter
-                    HAVING sisa_kouta > 0
-                    ORDER BY sisa_kouta DESC LIMIT 1";
-
-                $cek_kouta = fetch_array(query($sql_cek_kouta));
-                $cek_referensi = query("SELECT * FROM antrian_referensi WHERE nomor_referensi = '{$decode['nomorreferensi']}'");
+                $sql_cek_kouta = fetch_array(query("SELECT jadwal.kuota - (SELECT COUNT(booking_registrasi.tanggal_periksa) FROM booking_registrasi WHERE booking_registrasi.tanggal_periksa='$decode[tanggalperiksa]' AND booking_registrasi.kd_dokter=jadwal.kd_dokter) as sisa_kouta, jadwal.kd_dokter, jadwal.kd_poli, jadwal.jam_mulai as jam_mulai, poliklinik.nm_poli, dokter.nm_dokter FROM jadwal INNER JOIN maping_poli_bpjs ON maping_poli_bpjs.kd_poli_rs=jadwal.kd_poli INNER JOIN poliklinik ON poliklinik.kd_poli=jadwal.kd_poli INNER JOIN dokter ON dokter.kd_dokter=jadwal.kd_dokter WHERE jadwal.hari_kerja='$hari' AND maping_poli_bpjs.kd_poli_bpjs='$decode[kodepoli]' GROUP BY jadwal.kd_dokter HAVING sisa_kouta > 0 ORDER BY sisa_kouta DESC LIMIT 1"));
+                $cek_referensi = query("SELECT * FROM antrian_referensi WHERE nomor_referensi = '$decode[nomorreferensi]'");
+                $antrian_referensi = fetch_array($cek_referensi);
 
                 if(num_rows($cek_referensi) > 0) {
-        	         $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.date('d-m-Y', strtotime($decode[tanggalperiksa])).'.';
+        	         $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.date('d-m-Y', strtotime($antrian_referensi[tanggal_periksa])).'.';
                 }
                 if (mb_strlen($decode['nomorkartu'], 'UTF-8') <=> 13){
         	         $errors[] = 'Nomor kartu harus 13 digit';
@@ -106,6 +95,12 @@ if ($method == 'POST') {
                 if(!empty($decode['kodepoli']) && num_rows($poli) == 0) {
                    $errors[] = 'Kode poli tidak ditemukan';
                 }
+                if(empty($decode['nomorreferensi'])) {
+                   $errors[] = 'Nomor rujukan kosong atau tidak ditemukan';
+                }
+                if(empty($decode['tanggalperiksa'])) {
+                   $errors[] = 'Anda belum memilih tanggal periksa';
+                }
                 if(!empty($errors)) {
           	        foreach($errors as $error) {
                         $response = array(
@@ -119,7 +114,7 @@ if ($method == 'POST') {
                     if ($cek_kouta['sisa_kouta'] > 0) {
                         if(num_rows($data_pasien) == 0){
                             // Get antrian loket
-                            if(ANTRIAN_LITE == 'NO')  {
+                            if($antrian_lite == 0)  {
                               $no_reg_akhir = fetch_array(query("SELECT max(noantrian) FROM antrian_loket WHERE postdate='$decode[tanggalperiksa]'"));
                             } else {
                               $no_reg_akhir = fetch_array(query("SELECT max(noantrian) FROM antrian_loket WHERE type = 'Loket' AND postdate='$decode[tanggalperiksa]'"));
@@ -129,7 +124,7 @@ if ($method == 'POST') {
                             $jenisantrean = 1;
                             $minutes = $no_urut_reg * 10;
                             $cek_kouta['jam_mulai'] = date('H:i:s',strtotime('+'.$minutes.' minutes',strtotime($cek_kouta['jam_mulai'])));
-                            if(ANTRIAN_LITE == 'NO')  {
+                            if($antrian_lite == 0)  {
                               $query = query("INSERT INTO antrian_loket(kd, noantrian, postdate) VALUES (NULL, '$no_reg', '$decode[tanggalperiksa]')");
                             } else {
                               $query = query("INSERT INTO antrian_loket(kd, type, noantrian, postdate, start_time, end_time) VALUES (NULL, 'Loket', '$no_reg', '$decode[tanggalperiksa]', '$cek_kouta[jam_mulai]', '00:00:00')");
@@ -161,7 +156,9 @@ if ($method == 'POST') {
                                     'code' => 200
                                 )
                             );
-                            query("INSERT INTO antrian_referensi(tanggal_periksa, nomor_referensi) VALUES ('$decode[tanggalperiksa]','$decode[nomorreferensi]')");
+                            if(!empty($decode['nomorreferensi'])) {
+                              query("INSERT INTO antrian_referensi(tanggal_periksa, nomor_referensi) VALUES ('$decode[tanggalperiksa]','$decode[nomorreferensi]')");
+                            }
                             // debug only
                             //query("DELETE FROM booking_registrasi WHERE no_rkm_medis = '$data[no_rkm_medis]'");
                         } else {
