@@ -80,10 +80,10 @@ if ($method == 'POST') {
                 if(num_rows($cek_referensi) > 0) {
         	         $errors[] = 'Anda sudah terdaftar dalam antrian menggunakan nomor rujukan yang sama.';
                 }
-                if (mb_strlen($decode['nomorkartu'], 'UTF-8') <=> 13){
+                if (mb_strlen($decode['nomorkartu'], 'UTF-8') < 13){
         	         $errors[] = 'Nomor kartu harus 13 digit';
                 }
-                if(mb_strlen($decode['nik'], 'UTF-8') <=> 16){
+                if(mb_strlen($decode['nik'], 'UTF-8') < 16){
         	         $errors[] = 'Format nomor KTP tidak sesuai';
                 }
                 if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$decode['tanggalperiksa'])) {
