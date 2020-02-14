@@ -78,7 +78,7 @@ if ($method == 'POST') {
                 $antrian_referensi = fetch_array($cek_referensi);
 
                 if(num_rows($cek_referensi) > 0) {
-        	         $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.date('d-m-Y', strtotime($antrian_referensi[tanggal_periksa])).'.';
+        	         $errors[] = 'Anda sudah terdaftar dalam antrian menggunakan nomor rujukan yang sama.';
                 }
                 if (mb_strlen($decode['nomorkartu'], 'UTF-8') <=> 13){
         	         $errors[] = 'Nomor kartu harus 13 digit';
