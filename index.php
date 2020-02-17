@@ -210,6 +210,9 @@ if ($method == 'POST') {
                 if(num_rows($poli) == 0) {
                    $errors[] = 'Kode poli tidak ditemukan';
                 }
+                if($decode['polieksekutif'] == 1) {
+                   $errors[] = 'Maaf tidak ada jadwal Poli Eksekutif ditanggal ' . $decode['tanggalperiksa'];
+                }
 
                 if(!empty($errors)) {
           	        foreach($errors as $error) {
@@ -237,7 +240,7 @@ if ($method == 'POST') {
                     } else {
                         $response = array(
                             'metadata' => array(
-                                'message' => 'Maaf tidak Ada Jadwal ditanggal ' . $decode['tanggalperiksa'],
+                                'message' => 'Maaf tidak ada jadwal ditanggal ' . $decode['tanggalperiksa'],
                                 'code' => 401
                             )
                         );
