@@ -101,6 +101,9 @@ if ($method == 'POST') {
                 if(empty($decode['tanggalperiksa'])) {
                    $errors[] = 'Anda belum memilih tanggal periksa';
                 }
+                if($decode['polieksekutif'] >= 1) {
+                   $errors[] = 'Maaf tidak ada jadwal Poli Eksekutif ditanggal ' . $decode['tanggalperiksa'];
+                }
                 if(!empty($errors)) {
           	        foreach($errors as $error) {
                         $response = array(
@@ -210,7 +213,7 @@ if ($method == 'POST') {
                 if(num_rows($poli) == 0) {
                    $errors[] = 'Kode poli tidak ditemukan';
                 }
-                if($decode['polieksekutif'] == 1) {
+                if($decode['polieksekutif'] >= 1) {
                    $errors[] = 'Maaf tidak ada jadwal Poli Eksekutif ditanggal ' . $decode['tanggalperiksa'];
                 }
 
