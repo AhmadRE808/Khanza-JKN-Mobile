@@ -413,9 +413,10 @@ if ($method == 'POST') {
 
     }
 } else {
+    header('Content-Type: text/html; charset=utf-8');
     $instansi=fetch_assoc(query("select nama_instansi from setting"));
     echo "Selamat Datang di API ".$instansi['nama_instansi']." Antrean BPJS Mobile JKN..";
-    echo "\n\n\n";
-    echo "© ".date('Y')." ".$instansi['nama_instansi'];
+    echo "<br><br>";
+    echo "&copy; ".date('Y')." ".$instansi['nama_instansi'];
 }
 ?>
