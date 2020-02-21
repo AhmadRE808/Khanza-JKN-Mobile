@@ -10,10 +10,6 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 require_once('config.php');
 
-if (strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== true) {
-  $header['X-Token'] = $header['x-token'];
-}
-
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET["act"]) ? $_GET["act"] : null;
 
