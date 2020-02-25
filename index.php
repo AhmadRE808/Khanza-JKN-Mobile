@@ -71,7 +71,7 @@ if ($method == 'POST') {
                 $h1 = date('Y-m-d', $h1);
                 $_h1 = date('d-m-Y', strtotime($h1));
                 if(num_rows($cek_rujukan) > 0) {
-                  $h7 = strtotime('+82 days', strtotime($tglrujukan)) ;
+                  $h7 = strtotime('+82 days', strtotime($tglrujukan['tglrujukan']));
                 } else {
                   $h7 = strtotime('+7 days', strtotime($date)) ;
                 }
