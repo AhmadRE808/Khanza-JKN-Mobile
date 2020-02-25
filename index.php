@@ -65,7 +65,7 @@ if ($method == 'POST') {
 
                 // Cek Rujukan
                 $cek_rujukan = query("SELECT tglrujukan FROM bridging_sep WHERE no_rujukan = '$decode[nomorreferensi]' GROUP BY tglrujukan");
-                $tglrujukan = fetch_assoc['tglrujukan'];
+                $tglrujukan = fetch_assoc($cek_rujukan);
 
                 $h1 = strtotime('+1 days' , strtotime($date)) ;
                 $h1 = date('Y-m-d', $h1);
