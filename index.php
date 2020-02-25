@@ -63,10 +63,18 @@ if ($method == 'POST') {
                 $day = array('Sun' => 'AKHAD', 'Mon' => 'SENIN', 'Tue' => 'SELASA', 'Wed' => 'RABU', 'Thu' => 'KAMIS', 'Fri' => 'JUMAT', 'Sat' => 'SABTU');
                 $hari=$day[$tentukan_hari];
 
+                // Cek Rujukan
+                $cek_rujukan = query("SELECT tglrujukan FROM bridging_sep WHERE no_rujukan = '$decode[nomorreferensi]' GROUP BY tglrujukan");
+                $tglrujukan = fetch_assoc['tglrujukan'];
+
                 $h1 = strtotime('+1 days' , strtotime($date)) ;
                 $h1 = date('Y-m-d', $h1);
                 $_h1 = date('d-m-Y', strtotime($h1));
-                $h7 = strtotime('+7 days', strtotime($date)) ;
+                if(num_rows($cek_rujukan) > 0) {
+                  $h7 = strtotime('+82 days', strtotime($tglrujukan)) ;
+                } else {
+                  $h7 = strtotime('+7 days', strtotime($date)) ;
+                }
                 $h7 = date('Y-m-d', $h7);
                 $_h7 = date('d-m-Y', strtotime($h7));
 
@@ -83,13 +91,16 @@ if ($method == 'POST') {
                 if (mb_strlen($decode['nomorkartu'], 'UTF-8') < 13){
         	         $errors[] = 'Nomor kartu harus 13 digit';
                 }
+                if (!ctype_digit($decode['nomorkartu']) ){
+                   $errors[] = 'Nomor kartu harus mengandung angka saja.!!';
+                }
                 if(mb_strlen($decode['nik'], 'UTF-8') < 16){
         	         $errors[] = 'Format nomor KTP tidak sesuai';
                 }
                 if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$decode['tanggalperiksa'])) {
                    $errors[] = 'Format tanggal periksa tidak sesuai';
                 }
-                if($decode['tanggalperiksa'] == $date || $decode['tanggalperiksa'] > $h7) {
+                if($decode['tanggalperiksa'] < $h1 || $decode['tanggalperiksa'] > $h7) {
                    $errors[] = 'Tanggal periksa bisa dilakukan tanggal '.$_h1.' hingga tanggal '.$_h7;
                 }
                 if(!empty($decode['kodepoli']) && num_rows($poli) == 0) {
@@ -141,7 +152,8 @@ if ($method == 'POST') {
                           $jenisantrean = 2;
                           $minutes = $no_urut_reg * 10;
                           $cek_kouta['jam_mulai'] = date('H:i:s',strtotime('+'.$minutes.' minutes',strtotime($cek_kouta['jam_mulai'])));
-                          $query = query("insert into booking_registrasi set tanggal_booking=CURDATE(), jam_booking=CURTIME(), no_rkm_medis='$data[no_rkm_medis]', tanggal_periksa='$decode[tanggalperiksa]', kd_dokter='$cek_kouta[kd_dokter]', kd_poli='$cek_kouta[kd_poli]', no_reg='$no_reg',kd_pj='$kd_pj', limit_reg='1', waktu_kunjungan='$decode[tanggalperiksa] $cek_kouta[jam_mulai]', status='Belum'");
+                          $query = query("insert into booking_registrasi set tanggal_booking=CURDATE(),jam_booking=CURTIME(), no_rkm_medis='$data[no_rkm_medis]',tanggal_periksa='$decode[tanggalperiksa]',"
+                                  . "kd_dokter='$cek_kouta[kd_dokter]',kd_poli='$cek_kouta[kd_poli]',no_reg='$no_reg',kd_pj='$kd_pj',limit_reg='1',waktu_kunjungan='$decode[tanggalperiksa] $cek_kouta[jam_mulai]',status='Belum'");
                         }
                         if ($query) {
                             $response = array(
