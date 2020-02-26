@@ -1,5 +1,14 @@
 <?php
 
+/***
+* SIMRS Khanza JKN Mobile API from version 0.1
+* About : Simple JKN Mobile API for SIMKES Khanza based on M. Fauzan RS Kemayoran Jakarta Pusa initial script.
+* Last modified: 26 Pebruari 2020
+* Author : drg. Faisol Basoro
+* Email : dentix.id@gmail.com
+* Licence under GPL
+***/
+
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET");
@@ -112,6 +121,9 @@ if ($method == 'POST') {
                 if(empty($decode['tanggalperiksa'])) {
                    $errors[] = 'Anda belum memilih tanggal periksa';
                 }
+                if($decode['tanggalperiksa'] == $antrian_referensi['tanggal_periksa']) {
+                   $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.$decode['tanggalperiksa'];
+                }
                 if($decode['polieksekutif'] >= 1) {
                    $errors[] = 'Maaf tidak ada jadwal Poli Eksekutif ditanggal ' . $decode['tanggalperiksa'];
                 }
@@ -152,7 +164,7 @@ if ($method == 'POST') {
                           $jenisantrean = 2;
                           $minutes = $no_urut_reg * 10;
                           $cek_kouta['jam_mulai'] = date('H:i:s',strtotime('+'.$minutes.' minutes',strtotime($cek_kouta['jam_mulai'])));
-                          $query = query("insert into booking_registrasi set tanggal_booking=CURDATE(), jam_booking=CURTIME(), no_rkm_medis='$data[no_rkm_medis]', tanggal_periksa='$decode[tanggalperiksa]', kd_dokter='$cek_kouta[kd_dokter]', kd_poli='$cek_kouta[kd_poli]', no_reg='$no_reg',kd_pj='$kd_pj', limit_reg='1', waktu_kunjungan='$decode[tanggalperiksa] $cek_kouta[jam_mulai]',status='Belum'");
+                          $query = query("insert into booking_registrasi set tanggal_booking=CURDATE(), jam_booking=CURTIME(), no_rkm_medis='$data[no_rkm_medis]', tanggal_periksa='$decode[tanggalperiksa]', kd_dokter='$cek_kouta[kd_dokter]', kd_poli='$cek_kouta[kd_poli]', no_reg='$no_reg', kd_pj='$kd_pj', limit_reg='1', waktu_kunjungan='$decode[tanggalperiksa] $cek_kouta[jam_mulai]',status='Belum'");
                         }
                         if ($query) {
                             $response = array(
