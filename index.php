@@ -124,7 +124,7 @@ if ($method == 'POST') {
                 if(empty($decode['tanggalperiksa'])) {
                    $errors[] = 'Anda belum memilih tanggal periksa';
                 }
-                if($decode['tanggalperiksa'] == $antrian_referensi['tanggal_periksa']) {
+                if(!empty($decode['tanggalperiksa']) && $decode['tanggalperiksa'] == $antrian_referensi['tanggal_periksa']) {
                    $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.$decode['tanggalperiksa'];
                 }
                 if($decode['polieksekutif'] >= 1) {
