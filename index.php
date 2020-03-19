@@ -97,35 +97,41 @@ if ($method == 'POST') {
                 if(num_rows($cek_referensi) > 0) {
         	         $errors[] = 'Anda sudah terdaftar dalam antrian menggunakan nomor rujukan yang sama.';
                 }
-                if (mb_strlen($decode['nomorkartu'], 'UTF-8') < 13){
+                if(empty($decode['nomorkartu'])) {
+                   $errors[] = 'Nomor kartu tidak boleh kosong';
+                }
+                if (!empty($decode['nomorkartu']) && mb_strlen($decode['nomorkartu'], 'UTF-8') < 13){
         	         $errors[] = 'Nomor kartu harus 13 digit';
                 }
-                if (!ctype_digit($decode['nomorkartu']) ){
+                if (!empty($decode['nomorkartu']) && !ctype_digit($decode['nomorkartu']) ){
                    $errors[] = 'Nomor kartu harus mengandung angka saja!!';
                 }
-                if(mb_strlen($decode['nik'], 'UTF-8') < 16){
+                if(empty($decode['nik'])) {
+                   $errors[] = 'Nomor kartu tidak boleh kosong';
+                }
+                if(!empty($decode['nik']) && mb_strlen($decode['nik'], 'UTF-8') < 16){
         	         $errors[] = 'Nomor KTP harus 16 digiti atau format tidak sesuai';
                 }
-                if (!ctype_digit($decode['nik']) ){
+                if (!empty($decode['nik']) && !ctype_digit($decode['nik']) ){
                    $errors[] = 'Nomor kartu harus mengandung angka saja!!';
                 }
-                if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$decode['tanggalperiksa'])) {
+                if(empty($decode['tanggalperiksa'])) {
+                   $errors[] = 'Anda belum memilih tanggal periksa';
+                }
+                if (!empty($decode['tanggalperiksa']) && !preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$decode['tanggalperiksa'])) {
                    $errors[] = 'Format tanggal periksa tidak sesuai';
                 }
-                if($decode['tanggalperiksa'] < $h1 || $decode['tanggalperiksa'] > $h7) {
+                if(!empty($decode['tanggalperiksa']) && $decode['tanggalperiksa'] < $h1 || $decode['tanggalperiksa'] > $h7) {
                    $errors[] = 'Tanggal periksa bisa dilakukan tanggal '.$_h1.' hingga tanggal '.$_h7;
+                }
+                if(!empty($decode['tanggalperiksa']) && $decode['tanggalperiksa'] == $antrian_referensi['tanggal_periksa']) {
+                   $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.$decode['tanggalperiksa'];
                 }
                 if(!empty($decode['kodepoli']) && num_rows($poli) == 0) {
                    $errors[] = 'Kode poli tidak ditemukan';
                 }
                 if(empty($decode['nomorreferensi'])) {
                    $errors[] = 'Nomor rujukan kosong atau tidak ditemukan';
-                }
-                if(empty($decode['tanggalperiksa'])) {
-                   $errors[] = 'Anda belum memilih tanggal periksa';
-                }
-                if(!empty($decode['tanggalperiksa']) && $decode['tanggalperiksa'] == $antrian_referensi['tanggal_periksa']) {
-                   $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.$decode['tanggalperiksa'];
                 }
                 if($decode['polieksekutif'] >= 1) {
                    $errors[] = 'Maaf tidak ada jadwal Poli Eksekutif ditanggal ' . $decode['tanggalperiksa'];
