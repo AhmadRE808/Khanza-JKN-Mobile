@@ -133,7 +133,28 @@ if ($method == 'POST') {
                 if(empty($decode['nomorreferensi'])) {
                    $errors[] = 'Nomor rujukan kosong atau tidak ditemukan';
                 }
-                if($decode['polieksekutif'] >= 1) {
+                if(empty($decode['nomorreferensi'])) {
+                   $errors[] = 'Nomor rujukan kosong atau tidak ditemukan';
+                }
+                if(empty($decode['jenisreferensi'])) {
+                   $errors[] = 'Jenis referensi tidak boleh kosong';
+                }
+                if(!empty($decode['jenisreferensi']) && $decode['jenisreferensi'] !== 1 || $decode['jenisreferensi'] !== 2) {
+                   $errors[] = 'Jenis referensi tidak ditemukan';
+                }
+                if(empty($decode['jenisrequest'])) {
+                   $errors[] = 'Jenis request tidak boleh kosong';
+                }
+                if(!empty($decode['jenisrequest']) && $decode['jenisrequest'] !== 1 || $decode['jenisrequest'] !== 2) {
+                   $errors[] = 'Jenis request tidak ditemukan';
+                }
+                if(empty($decode['polieksekutif'])) {
+                   $errors[] = 'Jenis jadwal poli tidak boleh kosong';
+                }
+                if(!empty($decode['polieksekutif']) && $decode['polieksekutif'] !== 0 || $decode['jenisrequest'] !== 1) {
+                   $errors[] = 'Jenis jadwal poli tidak ditemukan';
+                }
+                if(!empty($decode['polieksekutif']) && $decode['polieksekutif'] == 1) {
                    $errors[] = 'Maaf tidak ada jadwal Poli Eksekutif ditanggal ' . $decode['tanggalperiksa'];
                 }
                 if(!empty($errors)) {
