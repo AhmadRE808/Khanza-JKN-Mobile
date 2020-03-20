@@ -148,13 +148,7 @@ if ($method == 'POST') {
                 if(!empty($decode['jenisrequest']) && $decode['jenisrequest'] !== 1 || $decode['jenisrequest'] !== 2) {
                    $errors[] = 'Jenis request tidak ditemukan';
                 }
-                if(empty($decode['polieksekutif'])) {
-                   $errors[] = 'Jenis jadwal poli tidak boleh kosong';
-                }
-                if(!empty($decode['polieksekutif']) && $decode['polieksekutif'] !== 0 || $decode['jenisrequest'] !== 1) {
-                   $errors[] = 'Jenis jadwal poli tidak ditemukan';
-                }
-                if(!empty($decode['polieksekutif']) && $decode['polieksekutif'] == 1) {
+                if($decode['polieksekutif'] >= 1) {
                    $errors[] = 'Maaf tidak ada jadwal Poli Eksekutif ditanggal ' . $decode['tanggalperiksa'];
                 }
                 if(!empty($errors)) {
