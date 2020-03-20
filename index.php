@@ -139,13 +139,13 @@ if ($method == 'POST') {
                 if(empty($decode['jenisreferensi'])) {
                    $errors[] = 'Jenis referensi tidak boleh kosong';
                 }
-                if(!empty($decode['jenisreferensi']) && $decode['jenisreferensi'] != 1 || $decode['jenisreferensi'] != 2) {
+                if(!empty($decode['jenisreferensi']) && $decode['jenisreferensi'] < 1 || $decode['jenisreferensi'] > 2) {
                    $errors[] = 'Jenis referensi tidak ditemukan';
                 }
                 if(empty($decode['jenisrequest'])) {
                    $errors[] = 'Jenis request tidak boleh kosong';
                 }
-                if(!empty($decode['jenisrequest']) && $decode['jenisrequest'] != 1 || $decode['jenisrequest'] != 2) {
+                if(!empty($decode['jenisrequest']) && $decode['jenisrequest'] < 1 || $decode['jenisrequest'] > 2) {
                    $errors[] = 'Jenis request tidak ditemukan';
                 }
                 if($decode['polieksekutif'] >= 1) {
