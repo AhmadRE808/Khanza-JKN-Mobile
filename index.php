@@ -127,6 +127,9 @@ if ($method == 'POST') {
                 if(!empty($decode['tanggalperiksa']) && $decode['tanggalperiksa'] == $antrian_referensi['tanggal_periksa']) {
                    $errors[] = 'Anda sudah terdaftar dalam antrian ditanggal '.$decode['tanggalperiksa'];
                 }
+                if(empty($decode['kodepoli'])) {
+                   $errors[] = 'Kode poli tidak boleh kosong';
+                }
                 if(!empty($decode['kodepoli']) && num_rows($poli) == 0) {
                    $errors[] = 'Kode poli tidak ditemukan';
                 }
